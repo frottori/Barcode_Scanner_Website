@@ -3,7 +3,8 @@
 ## App Setup 
 ```cd Barcode
    npm init -y
-   npm install express sqlite3 body-parser```
+   npm install express sqlite3 body-parser
+```
 
 ## Database Setup
 `sqlite3 database.db`
