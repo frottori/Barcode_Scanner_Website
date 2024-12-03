@@ -7,8 +7,8 @@
 ```
 
 ## Database Setup
-`sqlite3 database.db`
+```sqlite3 database.db```
 
 ## Run Application
-`node app.js`
+```node app.js```
 Open http://localhost:3000
