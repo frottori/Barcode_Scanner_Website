@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="images/Talos Uniwa.png" type="image/x-icon">
+</head>
+<body>
+    <h1>Barcode Scanner</h1>
+    <input type="text" id="search-input" placeholder="Search Item" style="margin-right: 10px;">
+    <button id="search-item-button"> Search</button>
+    <table id="scanned-items-table" border="1">
+    </table>
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="add-item-button">Add New Item</button>
+        <button id="take-item-button">Take Item</button>
+        <button id="delete-item-button">Delete Item</button>
+    </div>
+    <script src="barcode.js"></script>
+    <div id="output"></div>
+</body>
+</html>
