@@ -16,6 +16,7 @@ const db = new sqlite3.Database('./database.db', (err) => {
 });
 
 db.run('CREATE TABLE IF NOT EXISTS barcodes (id INTEGER PRIMARY KEY AUTOINCREMENT, barcode TEXT, name TEXT, quantity INTEGER DEFAULT 1, occupant TEXT DEFAULT None)');
+db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT)');
 
 app.post('/save', (req, res) => {
     const { barcode, name } = req.body;
@@ -99,7 +100,25 @@ app.post('/delete', (req, res) => {
         return res.status(400).json({ error: 'Barcode is required' });
     }
 
-    db.run('DELETE FROM barcodes WHERE barcode LIKE ?', [barcode], (err) => {
+    db.all('DELETE FROM barcodes WHERE barcode LIKE ?', [barcode], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+
+        res.json({ success: true });
+    });
+});
+
+app.post('/take', (req, res) => {
+
+    const { barcode, occupant } = req.body;
+
+    if (!barcode || !occupant) {
+        return res.status(400).json({ error: 'Barcode and occupant are required' });
+    }
+
+    db.run('UPDATE barcodes SET occupant = ? WHERE barcode LIKE ?', [occupant, barcode], (err) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });

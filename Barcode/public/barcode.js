@@ -4,6 +4,7 @@ let ScanTakeItem = false;
 let ScanDeleteItem = false;
 let scannedItemsTable = [];
 
+
 async function createHTMLTable(items){
     scannedItemsTable = document.getElementById('scanned-items-table');
     scannedItemsTable.innerHTML = ""; // Clear the table before rendering
@@ -109,8 +110,7 @@ document.addEventListener("keydown", async (event) => {
         }
     } else {
         scannedData += event.key; // Append the key to the scanned data
-    }
-    
+    }   
 });
 
 async function addItem(){
@@ -146,7 +146,6 @@ async function addItem(){
 
                           if (saveResponse.ok) {
                               console.log('Item saved successfully.');
-                              loadScannedItems(); // Reload the list after saving
                           } else {
                               console.error('Failed to save item.');
                           }
@@ -160,15 +159,54 @@ async function addItem(){
         }
 
         scannedData = ""; // Reset scanned data
-        ScanAddItem = false; // Reset the flag
+        ScanDeleteItem = false; // Reset the flag
         document.getElementById("output").textContent = "";
+        loadScannedItems();
     }
 }
 
 async function takeItem(){
-    scannedData = ""; // Reset scanned data
-    ScanTakeItem = false; // Reset the flag
-    document.getElementById("output").textContent = "";
+
+    if(!scannedData.trim() !== ""){ 
+         // First, check if the barcode already exists in the database
+         try {
+            const response = await fetch('/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ barcode: scannedData }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.exists) {
+                    quantity = data.quantity;
+                    const occuName = prompt("Enter the Occupant name:");
+
+                if (occuName) {
+               
+                        const saveResponse = await fetch('/take', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ barcode: scannedData, occupant: occuName }),
+                        });
+
+                        if (saveResponse.ok) {
+                            console.log('Item taken successfully.');
+                        } else {
+                            console.error('Failed to take item.');
+                        }
+                    } 
+                }    
+            }
+            scannedData = ""; // Reset scanned data
+            ScanDeleteItem = false; // Reset the flag
+            document.getElementById("output").textContent = "";
+            loadScannedItems();
+        }
+        catch (error) {
+            console.error('Error checking barcode:', error);
+        }
+    }
 }
 
 async function deleteItem(){
@@ -182,15 +220,15 @@ async function deleteItem(){
         const response = await fetch('/delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ barcode: searchText }), // Send barcode in the request body
+            body: JSON.stringify({ barcode: scannedData }), // Send barcode in the request body
         });
 
         if (response.ok) {
-            console.log('Item saved successfully.');
+            console.log('Item deleted successfully.');
             loadScannedItems();
         }
         else{
-            console.error('Failed to save item.');
+            console.error('Failed to delete item.');
         }
     }
     catch (error) {
@@ -201,6 +239,7 @@ async function deleteItem(){
     scannedData = ""; // Reset scanned data
     ScanDeleteItem = false; // Reset the flag
     document.getElementById("output").textContent = "";
+    loadScannedItems();
 }
 
 async function searchItem(searchText) {
