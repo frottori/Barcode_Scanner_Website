@@ -17,6 +17,18 @@ const db = new sqlite3.Database('./database.db', (err) => {
 
 db.run('CREATE TABLE IF NOT EXISTS barcodes (id INTEGER PRIMARY KEY AUTOINCREMENT, barcode TEXT, name TEXT, quantity INTEGER DEFAULT 1, occupant TEXT DEFAULT None)');
 db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT)');
+db.run(`
+    CREATE TABLE IF NOT EXISTS items_assigned (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        barcode_id INTEGER,
+        name TEXT,
+        barcode Text,
+        Quantity TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (barcode_id) REFERENCES barcodes(id)
+    )
+`);
 
 app.post('/save', (req, res) => {
     const { barcode, name } = req.body;
@@ -125,6 +137,35 @@ app.post('/take', (req, res) => {
         }
 
         res.json({ success: true });
+    });
+});
+
+
+app.get('/get-assigned-items', (req, res) => {
+    const query = `
+        SELECT users.name AS user_name, 
+               items_assigned.name AS item_name, 
+               items_assigned.barcode AS barcode, 
+               items_assigned.Quantity AS quantity
+        FROM items_assigned
+        JOIN users ON items_assigned.user_id = users.id
+        ORDER BY users.name;
+    `;
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            const groupedData = rows.reduce((acc, row) => {
+                if (!acc[row.user_name]) acc[row.user_name] = [];
+                acc[row.user_name].push({
+                    item_name: row.item_name,
+                    barcode: row.barcode,
+                    quantity: row.quantity,
+                });
+                return acc;
+            }, {});
+            res.json(groupedData);
+        }
     });
 });
 
