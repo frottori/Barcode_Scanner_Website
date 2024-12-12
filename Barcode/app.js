@@ -21,10 +21,10 @@ db.run(`
     name TEXT, 
     specs TEXT DEFAULT '-',
     quantity INTEGER DEFAULT 1, 
-    status TEXT DEFAULT 'New',
-    category TEXT DEFAULT 'N/A',
-    occupant TEXT DEFAULT None,
-    barcode TEXT
+    status TEXT DEFAULT 'Καινούργιο',
+    category TEXT DEFAULT '-',
+    occupant TEXT DEFAULT 'Κανένας',
+    barcode TEXT 
     )
 `);
 db.run(`CREATE TABLE IF NOT EXISTS users 
