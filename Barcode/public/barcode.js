@@ -16,8 +16,8 @@ async function createHTMLTable(items){
         <th>Name</th>
         <th>Specifications</th>
         <th>Quantity</th>
-        <th>Status</th>
-        <th>Category</th>
+        <th>Condition</th>
+        <th>Extra</th>
         <th>Occupant</th>
         <th>Barcode</th>
     `;
@@ -54,56 +54,56 @@ async function loadScannedItems() {
     }
 }
 
-async function loadAssignedItems(){
-  // Fetch data from the backend
-  fetch('/get-assigned-items')
-  .then(response => response.json())
-  .then(data => {
-      Object.entries(data).forEach(([userName, items]) => {
-          // Create a title for the user
-          const userTitle = document.createElement('h2');
-          userTitle.textContent = userName;
-          output.appendChild(userTitle);
+// async function loadAssignedItems(){
+//   // Fetch data from the backend
+//   fetch('/get-assigned-items')
+//   .then(response => response.json())
+//   .then(data => {
+//       Object.entries(data).forEach(([userName, items]) => {
+//           // Create a title for the user
+//           const userTitle = document.createElement('h2');
+//           userTitle.textContent = userName;
+//           output.appendChild(userTitle);
 
-          // Create a table for the user's items
-          const table = document.createElement('table');
-          table.border = '1';
-          table.style.marginBottom = '20px';
+//           // Create a table for the user's items
+//           const table = document.createElement('table');
+//           table.border = '1';
+//           table.style.marginBottom = '20px';
 
-          // Create table headers
-          const headerRow = document.createElement('tr');
-          const headers = ['Item Name', 'Barcode', 'Quantity'];
-          headers.forEach(headerText => {
-              const th = document.createElement('th');
-              th.textContent = headerText;
-              headerRow.appendChild(th);
-          });
-          table.appendChild(headerRow);
+//           // Create table headers
+//           const headerRow = document.createElement('tr');
+//           const headers = ['Item Name', 'Barcode', 'Quantity'];
+//           headers.forEach(headerText => {
+//               const th = document.createElement('th');
+//               th.textContent = headerText;
+//               headerRow.appendChild(th);
+//           });
+//           table.appendChild(headerRow);
 
-          // Populate table rows
-          items.forEach(item => {
-              const row = document.createElement('tr');
-              const itemCell = document.createElement('td');
-              itemCell.textContent = item.item_name;
+//           // Populate table rows
+//           items.forEach(item => {
+//               const row = document.createElement('tr');
+//               const itemCell = document.createElement('td');
+//               itemCell.textContent = item.item_name;
 
-              const barcodeCell = document.createElement('td');
-              barcodeCell.textContent = item.barcode;
+//               const barcodeCell = document.createElement('td');
+//               barcodeCell.textContent = item.barcode;
 
-              const quantityCell = document.createElement('td');
-              quantityCell.textContent = item.quantity;
+//               const quantityCell = document.createElement('td');
+//               quantityCell.textContent = item.quantity;
 
-              row.appendChild(itemCell);
-              row.appendChild(barcodeCell);
-              row.appendChild(quantityCell);
-              table.appendChild(row);
-          });
+//               row.appendChild(itemCell);
+//               row.appendChild(barcodeCell);
+//               row.appendChild(quantityCell);
+//               table.appendChild(row);
+//           });
 
-          // Append the table to the output div
-          output.appendChild(table);
-      });
-  })
-  .catch(error => console.error('Error fetching data:', error));
-}
+//           // Append the table to the output div
+//           output.appendChild(table);
+//       });
+//   })
+//   .catch(error => console.error('Error fetching data:', error));
+// }
 
 // Event listener for buttons
 document.getElementById("add-item-button").addEventListener("click", () => {
@@ -207,8 +207,8 @@ async function addItem(){
                 itemName = prompt("Enter Name:");
                 itemSpecs = prompt("Enter Specs:");
                 itemQuantity = prompt("Enter Quantity:");
-                itemStatus = prompt("Enter Status:");
-                itemCategory = prompt("Enter Category:");
+                itemStatus = prompt("Enter Condition:");
+                itemCategory = prompt("Enter Extra:");
 
                 ifEmpty(itemSpecs) ? itemSpecs = "-" : itemSpecs;
                 ifEmpty(itemQuantity) ? itemQuantity = 1 : itemQuantity;
@@ -266,8 +266,8 @@ async function editItem(){
         itemName = prompt("Enter New Name:");
         itemSpecs = prompt("Enter New Specs:");
         itemQuantity = prompt("Enter New Quantity:");
-        itemStatus = prompt("Enter New Status:");
-        itemCategory = prompt("Enter New Category:");
+        itemStatus = prompt("Enter New Condition:");
+        itemCategory = prompt("Enter New Extra:");
 
         console.log(itemName, itemSpecs, itemQuantity, itemStatus, itemCategory);
 
