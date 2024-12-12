@@ -137,7 +137,7 @@ app.post('/search', (req, res) => {
         return res.status(400).json({ error: 'Barcode is required' });
     }
 
-    db.all('SELECT id, barcode, name, quantity, occupant FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
+    db.all('SELECT id, barcode, name, quantity, specs, status, category, occupant FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
