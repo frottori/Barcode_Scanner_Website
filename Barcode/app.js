@@ -95,22 +95,6 @@ app.post('/check', (req, res) => {
     });
 });
 
-app.post('/update-barcode', (req, res) => {
-    const { barcode, id } = req.body;
-
-    if (!barcode || !id) {
-        return res.status(400).json({ error: 'name and id are required' });
-    }
-
-    db.all('UPDATE barcodes SET barcode = ? WHERE id = ?', [barcode, id], (err) => {
-        if (err) {
-            console.error('Database error:', err.message);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ success: true });
-    });
-});
-
 app.post('/delete', (req, res) => {
     const { barcode } = req.body;
 
@@ -146,35 +130,6 @@ app.post('/take', (req, res) => {
     });
 });
 
-
-app.get('/get-assigned-items', (req, res) => {
-    const query = `
-        SELECT users.name AS user_name, 
-               items_assigned.name AS item_name, 
-               items_assigned.barcode AS barcode, 
-               items_assigned.Quantity AS quantity
-        FROM items_assigned
-        JOIN users ON items_assigned.user_id = users.id
-        ORDER BY users.name;
-    `;
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else {
-            const groupedData = rows.reduce((acc, row) => {
-                if (!acc[row.user_name]) acc[row.user_name] = [];
-                acc[row.user_name].push({
-                    item_name: row.item_name,
-                    barcode: row.barcode,
-                    quantity: row.quantity,
-                });
-                return acc;
-            }, {});
-            res.json(groupedData);
-        }
-    });
-});
-
 app.post('/search', (req, res) => {
     const { barcode } = req.body; 
 
@@ -195,6 +150,40 @@ app.post('/search', (req, res) => {
 
         // Return the rows as JSON
         res.json(rows);
+    });
+});
+
+
+app.post('/update-barcode', (req, res) => {
+    const { barcode, id } = req.body;
+
+    if (!barcode || !id) {
+        return res.status(400).json({ error: 'name and id are required' });
+    }
+
+    db.all('UPDATE barcodes SET barcode = ? WHERE id = ?', [barcode, id], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/update-attr', (req, res) => {
+    let {barcode, attr, value} = req.body;
+
+    if (!barcode || !attr) {
+        return res.status(400).json({ error: 'fields barcode and attr are required' });
+    }
+
+    const query = `UPDATE barcodes SET ${attr} = ? WHERE barcode = ?`;
+    db.run(query, [value, barcode], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
     });
 });
 
@@ -261,3 +250,31 @@ function updateAllQuery(name, quantity, specs, status, category, barcode) {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// app.get('/get-assigned-items', (req, res) => {
+//     const query = `
+//         SELECT users.name AS user_name, 
+//                items_assigned.name AS item_name, 
+//                items_assigned.barcode AS barcode, 
+//                items_assigned.Quantity AS quantity
+//         FROM items_assigned
+//         JOIN users ON items_assigned.user_id = users.id
+//         ORDER BY users.name;
+//     `;
+//     db.all(query, [], (err, rows) => {
+//         if (err) {
+//             res.status(500).json({ error: err.message });
+//         } else {
+//             const groupedData = rows.reduce((acc, row) => {
+//                 if (!acc[row.user_name]) acc[row.user_name] = [];
+//                 acc[row.user_name].push({
+//                     item_name: row.item_name,
+//                     barcode: row.barcode,
+//                     quantity: row.quantity,
+//                 });
+//                 return acc;
+//             }, {});
+//             res.json(groupedData);
+//         }
+//     });
+// });

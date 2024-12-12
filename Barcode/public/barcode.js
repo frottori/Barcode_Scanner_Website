@@ -184,6 +184,13 @@ document.addEventListener("keydown", async (event) => {
     }   
 });
 
+function resetFlags(flag){
+    scannedData = ""; // Reset scanned data
+    flag = false; // Reset the flag
+    document.getElementById("output").textContent = "";
+    loadScannedItems();
+}
+
 async function addItem(){
     quantity = 1;
     if (scannedData.trim() !== "") {
@@ -215,36 +222,28 @@ async function addItem(){
                 ifEmpty(itemStatus) ? itemStatus = "New" : itemStatus;
                 ifEmpty(itemCategory) ? itemCategory = "N/A" : itemCategory;
 
-                  if (itemName) {
-                      // Send the barcode and name to the server for saving
-                      try {
-                          const saveResponse = await fetch('/save', {
+                if (itemName) {
+                    // Send the barcode and name to the server for saving
+                        const saveResponse = await fetch('/save', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ barcode: scannedData, name: itemName, 
                                                      specs: itemSpecs, quantity: itemQuantity,
                                                      status: itemStatus, category: itemCategory }),
-                          });
+                        });
 
-                          if (saveResponse.ok) {
-                              console.log('Item saved successfully.');
-                          } else {
-                              console.error('Failed to save item.');
-                          }
-                      } catch (error) {
-                          console.error('Error saving item:', error);
-                      }
+                        if (saveResponse.ok) {
+                            console.log('Item saved successfully.');
+                        } else {
+                            console.error('Failed to save item.');
+                        }
                   }
             }
         } catch (error) {
             console.error('Error checking barcode:', error);
         }
-
-        scannedData = ""; // Reset scanned data
-        ScanDeleteItem = false; // Reset the flag
-        document.getElementById("output").textContent = "";
-        loadScannedItems();
     }
+    resetFlags(ScanAddItem);
 }
 
 function ifEmpty(value){
@@ -255,61 +254,87 @@ function ifEmpty(value){
 }
 
 async function editItem(){
-    if (!scannedData.trim()) {
+    if (scannedData.trim() == "") {
         alert("Please enter a barcode to delete.");
         return;
     }
-    const id = prompt("Enter ID to Edit: (Leave blank to edit by barcode)");
+
+    let response;
+    const id = prompt("Enter ID to change its Barcode: (Click OK to edit by barcode)");
     try{
-    if (id == null || id == "") {
-        // Search from barcode
-        itemName = prompt("Enter New Name:");
-        itemSpecs = prompt("Enter New Specs:");
-        itemQuantity = prompt("Enter New Quantity:");
-        itemStatus = prompt("Enter New Condition:");
-        itemCategory = prompt("Enter New Extra:");
+        if (id == null || id == "") {
 
-        console.log(itemName, itemSpecs, itemQuantity, itemStatus, itemCategory);
+            editFields = prompt("Edit all fields? (Click OK or specify field to edit)");
 
-        // Make a POST request to the `/update-barcode` endpoint
-        const response = await fetch('/update-all', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: itemName, quantity: itemQuantity, 
-                specs: itemSpecs, status: itemStatus, category: itemCategory,  barcode: scannedData }),
-        });
+            // Search from barcode
+            switch(editFields.toLowerCase()){
+                case "name":
+                    attr = "name"; 
+                    value = prompt("Enter New Name:");
+                    break;
+                case "specifications":
+                    attr = "specs";
+                    value = prompt("Enter New Specs:");
+                    break;
+                case "quantity":
+                    attr = "quantity";
+                    value = prompt("Enter New Quantity:");
+                    break;
+                case "condition":
+                    attr = "status";
+                    value = prompt("Enter New Condition:");
+                    break;
+                case "extra":
+                    attr = "category";
+                    value = prompt("Enter New Extra:");
+                    break;
+                default:
+                    itemName = prompt("Enter New Name:");
+                    itemSpecs = prompt("Enter New Specs:");
+                    itemQuantity = prompt("Enter New Quantity:");
+                    itemStatus = prompt("Enter New Condition:");
+                    itemCategory = prompt("Enter New Extra:");
+                    break;
+            }
 
+            if(editFields === ""){
+                // Make a POST request to the `/update-barcode` endpoint
+                response = await fetch('/update-all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: itemName, quantity: itemQuantity, 
+                        specs: itemSpecs, status: itemStatus, category: itemCategory,  barcode: scannedData }),
+                });  
+            }
+            else{
+                // Make a POST request to the `/update-attr` endpoint
+                response = await fetch('/update-attr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ barcode: scannedData, attr: attr, value: value }),
+                });  
+            }
+        }
+        else{
+            // Make a POST request to the `/update-barcode` endpoint
+            response = await fetch('/update-barcode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ barcode: scannedData, id: id }),
+            });
+        }
+        
         if (response.ok) {
             console.log('Item edited successfully.');
         }
         else {
             console.error('Failed to edit item)');
-        }    
-    }
-    else{
-            // Make a POST request to the `/update-barcode` endpoint
-            const response = await fetch('/update-barcode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barcode: scannedData, id: id }),
-            });
-
-            if (response.ok) {
-                console.log('Item edited successfully.');
-                loadScannedItems();
-            }
-            else {
-                console.error('Failed to edit item)');
-            }   
-        }
+        }  
     }
     catch(error){
         console.error('Error editing item:', error);
     }
-    scannedData = ""; // Reset scanned data
-    ScanEditItem = false; // Reset the flag
-    document.getElementById("output").textContent = "";
-    loadScannedItems();
+    resetFlags(ScanEditItem);
 }
 
 async function takeItem(){
@@ -348,15 +373,12 @@ async function takeItem(){
             else{
                 alert("Item not Found...");
             }
-            scannedData = ""; // Reset scanned data
-            ScanDeleteItem = false; // Reset the flag
-            document.getElementById("output").textContent = "";
-            loadScannedItems();
         }
         catch (error) {
             console.error('Error checking barcode:', error);
         }
     }
+    resetFlags(ScanTakeItem);
 }
 
 async function deleteItem(){
@@ -384,11 +406,7 @@ async function deleteItem(){
         console.error('Error deleting item:', error);
         alert('An error occurred while deleting.');
     }
-
-    scannedData = ""; // Reset scanned data
-    ScanDeleteItem = false; // Reset the flag
-    document.getElementById("output").textContent = "";
-    loadScannedItems();
+    resetFlags(ScanDeleteItem);
 }
 
 async function searchItem(searchText) {
