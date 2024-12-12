@@ -161,3 +161,26 @@ input[type="text"]:focus {
 .header-container img {
     height: 120px; /* Adjust the height as needed */
 }
+
+/* Style for the "Member Assigned Items" link */
+a {
+    color: #1c6298; /* Nice blue color */
+    font-size: 18px; /* Slightly larger font size for visibility */
+    font-weight: bold; /* Make the text bold */
+    text-decoration: none; /* Remove underline */
+    margin-bottom: 10px; /* Add space below */
+    transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for the link */
+a:hover {
+    color: #4191c0; /* Lighter blue shade */
+    text-shadow: 0px 0px 5px rgba(65, 145, 192, 0.5); /* Subtle glow effect */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Active (click) state */
+a:active {
+    color: #14476f; /* Darker blue when clicked */
+    text-shadow: none; /* Remove glow on active */
+}

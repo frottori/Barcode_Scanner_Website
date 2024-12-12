@@ -219,8 +219,8 @@ async function addItem(){
 
                 ifEmpty(itemSpecs) ? itemSpecs = "-" : itemSpecs;
                 ifEmpty(itemQuantity) ? itemQuantity = 1 : itemQuantity;
-                ifEmpty(itemStatus) ? itemStatus = "New" : itemStatus;
-                ifEmpty(itemCategory) ? itemCategory = "N/A" : itemCategory;
+                ifEmpty(itemStatus) ? itemStatus = "Άγνωστη" : itemStatus;
+                ifEmpty(itemCategory) ? itemCategory = "-" : itemCategory;
 
                 if (itemName) {
                     // Send the barcode and name to the server for saving

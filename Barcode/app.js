@@ -21,7 +21,7 @@ db.run(`
     name TEXT, 
     specs TEXT DEFAULT '-',
     quantity INTEGER DEFAULT 1, 
-    status TEXT DEFAULT 'Καινούργιο',
+    status TEXT DEFAULT 'Άγνωστη',
     category TEXT DEFAULT '-',
     occupant TEXT DEFAULT '-',
     barcode TEXT 
