@@ -28,7 +28,7 @@ INSERT INTO barcodes (barcode, name, specs) VALUES
 (27, 'Αισθητήρας Άνθρακας & Μεθανίου MQ4','Ιδανικό για τα εξής αέρια: H2, LPG, CH4, CO, Alcohol'),
 (28, 'Raspberry Pi 5 Official USB-C Pd Power Supply','27W'),
 (29, 'Καλώδιο Τροφοδοσίας','Output 8.4V'),
-(30, 'Power Brick (Για Breadboard)',',Output: 5V'),
+(30, 'Power Brick (Για Breadboard)','Output: 5V'),
 (31, 'Speaker Waterproof','2W 8Ohm - 50mm'),
 (32, 'Power Supply','12V 3A'),
 (33, 'Samsung INR 18650 Επαναφορτιζόμενες','3500mAh 3.7V'),

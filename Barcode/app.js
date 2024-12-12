@@ -23,7 +23,7 @@ db.run(`
     quantity INTEGER DEFAULT 1, 
     status TEXT DEFAULT 'Καινούργιο',
     category TEXT DEFAULT '-',
-    occupant TEXT DEFAULT 'Κανένας',
+    occupant TEXT DEFAULT '-',
     barcode TEXT 
     )
 `);
