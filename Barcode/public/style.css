@@ -1,30 +1,24 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #badce7;
     margin: 0;
     padding: 0;
 }
 
 h1 {
-    color: #333;
-    text-align: center;
-}
-
-h2 {
-    padding-left: 20px; 
-    padding-bottom: 0px;
-}
-
-p {
-    color: #555;
-    font-size: 1.2em;
+    color: #ffffff;
+    text-align: left;
+    padding: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #output {
+    padding-top: 5px;
+    color: #ffffff;
     text-align: center;
     margin: 0 auto; 
     width: 80%; 
-    padding: 20px; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Style the table header */
@@ -37,14 +31,13 @@ p {
 
 /* Style the Name column */
 #scanned-items-table td:first-child {
-    background-color: #e7f7ff; /* Light blue background */
+    background-color: #e9f2f6; /* Light blue background */
     color: #000; /* Black text */
     padding: 10px;
 }
 
 /* Style the Barcode column */
 #scanned-items-table td:last-child {
-    background-color: #ffffff; /* Light yellow background */
     color: #000; /* Black text */
     padding: 10px;
 }
@@ -53,11 +46,11 @@ p {
 #scanned-items-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    background-color: #ffffff;
 }
 
 #scanned-items-table th, #scanned-items-table td {
-    border: 1px solid #ddd; /* Add a border around cells */
+    border: 1px solid #e9e7e7; /* Add a border around cells */
 }
 
 /* Add hover effect for rows */
@@ -121,4 +114,27 @@ div {
     text-align: left;
     margin-top: 20px;
     margin-left: 10px;
+}
+
+.sticky-header {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    background-color: #badce7;
+    z-index: 1000;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    margin: 0; /* Remove margins */
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-container h1 {
+    margin: 0 0px;
+}
+.header-container img {
+    height: 120px; /* Adjust the height as needed */
 }

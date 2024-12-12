@@ -15,8 +15,22 @@ const db = new sqlite3.Database('./database.db', (err) => {
     else console.log('Connected to SQLite database.');
 });
 
-db.run('CREATE TABLE IF NOT EXISTS barcodes (id INTEGER PRIMARY KEY AUTOINCREMENT, barcode TEXT, name TEXT, quantity INTEGER DEFAULT 1, occupant TEXT DEFAULT None)');
-db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT)');
+db.run(`
+    CREATE TABLE IF NOT EXISTS barcodes 
+    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT, 
+    specs TEXT DEFAULT '-',
+    quantity INTEGER DEFAULT 1, 
+    status TEXT DEFAULT 'New',
+    category TEXT DEFAULT 'N/A',
+    occupant TEXT DEFAULT None,
+    barcode TEXT
+    )
+`);
+db.run(`CREATE TABLE IF NOT EXISTS users 
+    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    name TEXT, email TEXT, 
+    phone TEXT)`);
 db.run(`
     CREATE TABLE IF NOT EXISTS items_assigned (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,13 +45,13 @@ db.run(`
 `);
 
 app.post('/save', (req, res) => {
-    const { barcode, name } = req.body;
+    const { barcode, name, specs, quantity, status, category } = req.body;
 
-    if (!barcode || !name) {
-        return res.status(400).json({ error: 'Barcode and name are required' });
+    if (!barcode || !name || !specs || !quantity || !status || !category) {
+        return res.status(400).json({ error: 'fields are required' });
     }
 
-    db.run('INSERT INTO barcodes (barcode, name) VALUES (?, ?)', [barcode, name], (err) => {
+    db.run('INSERT INTO barcodes (barcode, name, specs, quantity, status, category) VALUES (?,?,?,?,?,?)', [barcode, name, specs, quantity, status, category], (err) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
@@ -46,14 +60,13 @@ app.post('/save', (req, res) => {
     });
 });
 
-
 app.get('/barcodes', (req, res) => {
-    db.all('SELECT id, barcode, name, quantity, occupant FROM barcodes', [], (err, rows) => {
+    db.all('SELECT id, name, specs, quantity, status, category, occupant, barcode FROM barcodes', [], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-        res.json(rows); // Send the rows as JSON
+        return res.json(rows); // Send the rows as JSON
     });
 });
 
@@ -82,26 +95,19 @@ app.post('/check', (req, res) => {
     });
 });
 
-app.post('/search', (req, res) => {
-    const { barcode } = req.body; 
+app.post('/update-barcode', (req, res) => {
+    const { barcode, id } = req.body;
 
-    if (!barcode) {
-        return res.status(400).json({ error: 'Barcode is required' });
+    if (!barcode || !id) {
+        return res.status(400).json({ error: 'name and id are required' });
     }
 
-    db.all('SELECT id, barcode, name, quantity, occupant FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
+    db.all('UPDATE barcodes SET barcode = ? WHERE id = ?', [barcode, id], (err) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-
-        if (rows.length === 0) {
-            // Return a 404 if no matching rows are found
-            return res.status(404).json({ error: 'No items found with that barcode' });
-        }
-
-        // Return the rows as JSON
-        res.json(rows);
+        res.json({ success: true });
     });
 });
 
@@ -168,6 +174,88 @@ app.get('/get-assigned-items', (req, res) => {
         }
     });
 });
+
+app.post('/search', (req, res) => {
+    const { barcode } = req.body; 
+
+    if (!barcode) {
+        return res.status(400).json({ error: 'Barcode is required' });
+    }
+
+    db.all('SELECT id, barcode, name, quantity, occupant FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (rows.length === 0) {
+            // Return a 404 if no matching rows are found
+            return res.status(404).json({ error: 'No items found with that barcode' });
+        }
+
+        // Return the rows as JSON
+        res.json(rows);
+    });
+});
+
+app.post('/update-all', (req, res) => {
+    let { name, quantity, specs, status, category, barcode } = req.body;
+
+    if (!barcode) { 
+        return res.status(400).json({ error: 'fields name and barcode are required' });
+    }
+    
+    const { query, attr } = updateAllQuery(name, quantity, specs, status, category, barcode);
+
+    db.run(query, attr, (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+function ifEmpty(attr) {
+    if (attr === '' || attr === null) {
+        return true;
+    }
+    return false;
+}
+
+function updateAllQuery(name, quantity, specs, status, category, barcode) {
+    let query = '';
+    let attr = [];
+
+    switch (true) {
+        case ifEmpty(name):
+            query = 'UPDATE barcodes SET quantity = ?, specs = ?, status = ?, category = ? WHERE barcode = ?';
+            attr = [quantity, specs, status, category, barcode];
+            break;
+        case ifEmpty(quantity):
+            query = 'UPDATE barcodes SET name = ?, specs = ?, status = ?, category = ? WHERE barcode = ?';
+            attr = [name, specs, status, category, barcode];
+            break;
+        case ifEmpty(specs):
+            query = 'UPDATE barcodes SET name = ?, quantity = ?, status = ?, category = ? WHERE barcode = ?';
+            attr = [name, quantity, status, category, barcode];
+            break;
+        case ifEmpty(status):
+            query = 'UPDATE barcodes SET name = ?, quantity = ?, specs = ?, category = ? WHERE barcode = ?';
+            attr = [name, quantity, specs, category, barcode];
+            break;
+        case ifEmpty(category):
+            query = 'UPDATE barcodes SET name = ?, quantity = ?, specs = ?, status = ? WHERE barcode = ?';
+            attr = [name, quantity, specs, status, barcode];
+            break;
+        default:
+            query = 'UPDATE barcodes SET name = ?, quantity = ?, specs = ?, status = ?, category = ? WHERE barcode = ?';
+            attr = [name, quantity, specs, status, category, barcode];
+            break;
+    }
+
+    return { query, attr };
+}
 
 // Start server
 app.listen(PORT, () => {

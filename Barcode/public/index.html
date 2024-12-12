@@ -8,15 +8,22 @@
     <link rel="icon" href="images/Talos Uniwa.png" type="image/x-icon">
 </head>
 <body>
-    <h1>Barcode Scanner</h1>
-    <input type="text" id="search-input" placeholder="Search Item" style="margin-right: 10px;">
-    <button id="search-item-button"> Search</button>
-      <div>
-        <button id="add-item-button">Add New Item</button>
-        <button id="take-item-button">Take Item</button>
-        <button id="delete-item-button">Delete Item</button>
+    <div class="sticky-header">
+        <div class="header-container">
+            <img src="images/uniwa_logo.png" alt="Center Image">
+            <h1>Talos Lab Equipment</h1>
+        </div>
+        <input type="text" id="search-input" placeholder="Search by Barcode" style="margin-right: 10px;">
+        <button id="search-item-button" style="background-color: #1178c6;">Search</button>
+        <div>
+            <button id="add-item-button">Add Item</button>
+            <button id="take-item-button">Assign Item</button>
+            <button id="edit-item-button">Edit Item</button>
+            <button id="delete-item-button">Delete Item</button>
+        </div>
+        <div id="output" style="text-align: left;"></div>
     </div>
-    <div id="output" style="text-align: left;"></div>
+    
     <table id="scanned-items-table" border="1">
     </table>
     <script src="barcode.js"></script>
