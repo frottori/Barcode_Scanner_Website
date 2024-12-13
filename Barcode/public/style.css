@@ -49,7 +49,6 @@ button:disabled {
 /* Add space between adjacent buttons */
 button + button {
     margin-left: 10px; 
-    margin-bottom: 10px;
 }
 
 /* Style the input field to match the button size and style */

@@ -176,3 +176,62 @@ document.getElementById("delete-user-button").addEventListener("click", async ()
         console.error('Error deleting user:', err);
     }
 });
+
+document.getElementById("delete-item-assigned-button").addEventListener("click", async () => {
+    
+        const AM = prompt("Enter AM:");
+        const barcode = prompt("Enter Barcode:");
+    
+        if (!AM || !barcode) {
+            alert('AM and Barcode are required');
+            return;
+        }
+    
+        try{
+            const response  = await fetch('/delete-item-assigned', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ AM, barcode })
+            });
+    
+            if (response.ok) {
+                alert('Item deleted successfully');
+                window.location.reload();
+            }
+            else{
+                alert('Error deleting item');
+            }
+        }
+        catch(err){
+            console.error('Error deleting item:', err);
+        }
+});
+
+document.getElementById("clear-items-assigned-button").addEventListener("click", async () => {
+        
+            const AM = prompt("Enter AM:");
+        
+            if (!AM) {
+                alert('AM is required');
+                return;
+            }
+        
+            try{
+                const response  = await fetch('/clear-items-assigned', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ AM })
+                });
+        
+                if (response.ok) {
+                    alert('Items deleted successfully');
+                    window.location.reload();
+                }
+                else{
+                    alert('Error deleting items');
+                }
+            }
+            catch(err){
+                console.error('Error deleting items:', err);
+            }
+});

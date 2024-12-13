@@ -73,7 +73,7 @@ app.post('/save', (req, res) => {
 });
 
 app.post('/check', (req, res) => {
-    const { barcode } = req.body;
+    const { barcode, flag } = req.body;
 
     if (!barcode) {
         return res.status(400).json({ error: 'Barcode is required' });
@@ -86,11 +86,15 @@ app.post('/check', (req, res) => {
             return res.status(500).json({ error: err.message });
         }
 
-        if (row) {
+        if (row && flag) {
             // Barcode exists, return the current quantity
             db.run('UPDATE barcodes SET quantity = quantity + 1 WHERE barcode = ?', [barcode]);
             return res.status(200).json({ exists: true, quantity: row.quantity });
-        } else {
+        } 
+        else if (flag == false) {
+            return res.status(200).json({ exists: true });
+        } 
+        else {
             // Barcode doesn't exist
             return res.status(404).json({ exists: false });
         }
@@ -446,5 +450,40 @@ app.post('/search-user', (req, res) => {
         });
 
         res.json(groupedData);
+    });
+});
+
+app.post('/delete-item-assigned', (req, res) => {
+    const {AM, barcode} = req.body;
+
+    if (!AM || !barcode) {
+        return res.status(400).json({ error: 'AM and barcode are required' });
+    }
+
+    db.run(`DELETE FROM items_assigned 
+            WHERE user_id = (SELECT id FROM users WHERE AM = ?) 
+            AND barcode_id = (SELECT id FROM barcodes WHERE barcode = ?)`, [AM, barcode], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/clear-items-assigned', (req, res) => {
+    const { AM } = req.body;
+
+    if (!AM) {
+        return res.status(400).json({ error: 'AM is required' });
+    }
+
+    db.run(`DELETE FROM items_assigned 
+            WHERE user_id = (SELECT id FROM users WHERE AM = ?)`, [AM], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
     });
 });

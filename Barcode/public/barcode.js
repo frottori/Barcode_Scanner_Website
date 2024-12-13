@@ -146,7 +146,7 @@ async function addItem(){
             const response = await fetch('/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barcode: scannedData }),
+                body: JSON.stringify({ barcode: scannedData, flag: true }),
             });
 
             if (response.ok) {
@@ -292,7 +292,7 @@ async function takeItem(){
             const response = await fetch('/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barcode: scannedData }),
+                body: JSON.stringify({ barcode: scannedData, flag: false }),
             });
 
             if (response.ok) {
