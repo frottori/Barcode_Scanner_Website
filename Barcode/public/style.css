@@ -176,6 +176,7 @@ table td:first-child {
     align-items: center;
     justify-content: space-between; /* Distribute space between items */
     padding: 0 10px; /* Add some padding to the sides */
+    margin-bottom: 10px; /* Add space below the header */
 }
 
 .header-container h1 {
