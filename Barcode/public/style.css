@@ -197,7 +197,7 @@ table td:first-child {
 #member {
     margin-left: auto; /* Push the link to the far right */
     color: #1c6298; /* Nice blue color */
-    font-size: 18px; /* Slightly larger font size for visibility */
+    font-size: 20px; /* Slightly larger font size for visibility */
     font-weight: bold; /* Make the text bold */
     text-decoration: none; /* Remove underline */
     transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth hover effect */
