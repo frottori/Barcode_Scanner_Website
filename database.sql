@@ -89,13 +89,13 @@ INSERT INTO barcodes (barcode, name, specs, quantity, status, category) VALUES
 
 INSERT INTO users (AM,name, email, phone) VALUES 
 ('21390095','ΔΗΜΗΤΡΗΣ ΚΟΝΤΟΥΛΗΣ', 'dimkon2003@gmail.com', '6987807595'),
-('24390025','ΔΗΜΗΤΡΑ ΦΛΏΡΟΥ', 'dimiflo79@gmail.com', '6987807595'),
-('21390021','ΕΥΦΡΟΣΥΝΗ ΒΑΡΣΟΥ', 'frossovarsou@gmail.com', '6987807595'),
-('21390066','ΣΠΥΡΙΔΩΝ ΘΑΝΟΣ', 'spyrosthan2205@gmail.com', '6987807595'),
-('21390146','ΝΙΚΟΛΑΟΣ-ΙΣΑΑΚ ΜΠΙΤΣΙΚΑΣ', 'nikolasbts03@gmail.com', '6987807595'),
-('21390132','ΆΓΓΕΛΟΣ ΚΩΝΣΤΑΝΤΊΝΟΣ ΜΕΝΤΖΕΛΟΣ', 'aggelosmentzelos8@gmail.com', '6987807595'),
-('21390116','ΗΛΊΑΣ ΔΗΜΉΤΡΙΟΣ ΚΩΣΤΟΠΟΥΛΟΣ', 'kostopoulos.ilias53@gmail.com', '6987807595'),
-('24390075','ΕΜΜΑΝΟΥΉΛ  ΚΌΡΜΠΗΣ ', 'mkormpis@gmail.com', '6987807595'),
-('21390176','ΙΩΑΝΝΗΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', 'giannespapadopoulos4@gmail.com', '6987807595'),
-('24390128','ΒΑΣΙΛΕΙΟΣ ΜΑΝΩΛΑΚΑΣ', 'vasilismanolakas@gmail.com', '6987807595'),
-('21390150','ΒΑΣΙΛΕΙΟΣ ΜΑΝΩΛΑΚΑΣ', 'xristosbuzukas100@gmail.com', '6987807595');
+('24390025','ΔΗΜΗΤΡΑ ΦΛΩΡΟΥ', 'dimiflo79@gmail.com', '6973952931'),
+('21390021','ΕΥΦΡΟΣΥΝΗ ΒΑΡΣΟΥ', 'frossovarsou@gmail.com', '6984326354'),
+('21390066','ΣΠΥΡΙΔΩΝ ΘΑΝΟΣ', 'spyrosthan2205@gmail.com', '6980576106'),
+('21390146','ΝΙΚΟΛΑΟΣ-ΙΣΑΑΚ ΜΠΙΤΣΙΚΑΣ', 'nikolasbts03@gmail.com', '6947148838'),
+('21390132','ΑΓΓΕΛΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ ΜΕΝΤΖΕΛΟΣ', 'aggelosmentzelos8@gmail.com', '6985783274'),
+('21390116','ΗΛΊΑΣ ΔΗΜΉΤΡΙΟΣ ΚΩΣΤΟΠΟΥΛΟΣ', 'kostopoulos.ilias53@gmail.com', '6981647865'),
+('24390075','ΕΜΜΑΝΟΥΉΛ  ΚΟΡΜΠΗΣ ', 'mkormpis@gmail.com', '6983820982'),
+('21390176','ΙΩΑΝΝΗΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', 'giannespapadopoulos4@gmail.com', '6940371706'),
+('24390128','ΒΑΣΙΛΕΙΟΣ ΜΑΝΩΛΑΚΑΣ', 'vasilismanolakas@gmail.com', '6943723452'),
+('21390150','ΧΡΗΣΤΟΣ ΜΠΟΥΖΟΥΚΑΣ', 'xristosbuzukas100@gmail.com', '6995225791');

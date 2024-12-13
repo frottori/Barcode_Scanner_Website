@@ -286,7 +286,7 @@ app.get('/get-assigned-items', (req, res) => {
                users.email AS user_email, 
                users.phone AS user_phone,
                users.AM AS user_AM,
-
+               barcodes.id AS barcode_id,
                barcodes.name AS item_name, 
                barcodes.specs AS item_specs,
                barcodes.barcode AS barcode, 
@@ -311,6 +311,7 @@ app.get('/get-assigned-items', (req, res) => {
                 }
                 if (row.item_name) { // Add item if it exists
                     acc[row.user_name].items.push({
+                        barcode_id: row.barcode_id,
                         item_name: row.item_name,
                         item_specs: row.item_specs,
                         barcode: row.barcode,
@@ -324,6 +325,7 @@ app.get('/get-assigned-items', (req, res) => {
             Object.keys(groupedData).forEach(userName => {
                 if (groupedData[userName].items.length === 0) {
                     groupedData[userName].items.push({
+                        barcode_id: '-',
                         item_name: '-',
                         item_specs: '-',
                         barcode: '-',
@@ -397,6 +399,7 @@ app.post('/search-user', (req, res) => {
                users.email AS user_email, 
                users.phone AS user_phone,
                users.AM AS user_AM,
+               barcodes.id AS barcode_id,
                barcodes.name AS item_name, 
                barcodes.specs AS item_specs,
                barcodes.barcode AS barcode, 
@@ -428,6 +431,7 @@ app.post('/search-user', (req, res) => {
             }
             if (row.item_name) { // Add item if it exists
                 acc[row.user_name].items.push({
+                    barcode_id: row.barcode_id,
                     item_name: row.item_name,
                     item_specs: row.item_specs,
                     barcode: row.barcode,
@@ -441,6 +445,7 @@ app.post('/search-user', (req, res) => {
         Object.keys(groupedData).forEach(userName => {
             if (groupedData[userName].items.length === 0) {
                 groupedData[userName].items.push({
+                    barcode_id: '-',
                     item_name: '-',
                     item_specs: '-',
                     barcode: '-',

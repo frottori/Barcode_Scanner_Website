@@ -81,6 +81,12 @@ input[type="text"]:focus {
 table td {
     text-align: center;
     padding: 10px;
+    table-layout: auto;
+}
+
+td:nth-child(1), th:nth-child(1) {
+    width: 1%; /* Forces the column to shrink to fit its content */
+    white-space: nowrap; /* Prevents content from wrapping */
 }
 
 table td:first-child {
@@ -109,7 +115,7 @@ table td:first-child {
 }
 
 /* Style the Name column */
-#scanned-items-table td:first-child {
+#scanned-items-table td:first-child, table td:first-child {
     background-color: #1f5075de; 
     color: #ffffff; 
     padding: 10px;

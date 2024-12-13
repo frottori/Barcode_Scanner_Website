@@ -18,7 +18,8 @@ function createHTMLUserTable(data) {
 
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
-            <th>Item Name</th>
+            <th>ID</th>
+            <th>Name</th>
             <th>Specifications</th>
             <th>Quantity</th>
             <th>Barcode</th>
@@ -28,6 +29,7 @@ function createHTMLUserTable(data) {
         userInfo.items.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
+                <td>${item.barcode_id}</td>
                 <td>${item.item_name}</td>
                 <td>${item.item_specs}</td>
                 <td>${item.quantity}</td>
