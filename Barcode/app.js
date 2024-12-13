@@ -119,7 +119,6 @@ app.post('/delete', (req, res) => {
 });
 
 app.post('/take', (req, res) => {
-
     const { barcode, AM, quantity } = req.body;
 
     if (!barcode || !AM) {
@@ -145,14 +144,33 @@ app.post('/take', (req, res) => {
             if (!barcodeItem) {
                 return res.status(404).json({ error: 'Barcode not found' });
             }
-    
-            db.run('INSERT INTO items_assigned (user_id, barcode_id, quantity) VALUES (?,?,?)', 
-                [user.id, barcodeItem.id, quantity], (err) => {
+
+            db.get('SELECT id, quantity FROM items_assigned WHERE user_id = ? AND barcode_id = ?', [user.id, barcodeItem.id], (err, itemAssigned) => {
                 if (err) {
                     console.error('Database error:', err.message);
                     return res.status(500).json({ error: err.message });
                 }
-                res.status(201).json({ success: true });
+
+                if (itemAssigned) {
+                    // Item already assigned, update the quantity
+                    db.run('UPDATE items_assigned SET quantity = quantity + ? WHERE id = ?', [quantity, itemAssigned.id], (err) => {
+                        if (err) {
+                            console.error('Database error:', err.message);
+                            return res.status(500).json({ error: err.message });
+                        }
+                        res.status(200).json({ success: true });
+                    });
+                } else {
+                    // Item not assigned, insert new record
+                    db.run('INSERT INTO items_assigned (user_id, barcode_id, quantity) VALUES (?,?,?)', 
+                        [user.id, barcodeItem.id, quantity], (err) => {
+                        if (err) {
+                            console.error('Database error:', err.message);
+                            return res.status(500).json({ error: err.message });
+                        }
+                        res.status(201).json({ success: true });
+                    });
+                }
             });
         });
     });
