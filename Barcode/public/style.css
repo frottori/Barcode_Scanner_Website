@@ -70,12 +70,13 @@ input[type="text"]:focus {
 }
 
 #output {
-    padding-top: 5px;
+    padding-top: 10px;
     color: #ffffff;
     text-align: center;
-    margin: 0 auto; 
+    margin: 0 auto;     
     width: 80%; 
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 21px;
 }
 
 table td {
@@ -188,7 +189,7 @@ table td:first-child {
 .user-items-container {
     padding: 0px;
     background-color: inherit; /* Matches the body's color */
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 #member {
