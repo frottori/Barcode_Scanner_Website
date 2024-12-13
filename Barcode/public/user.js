@@ -70,9 +70,6 @@ document.getElementById("search-user-button").addEventListener("click", async ()
             const items = await response.json();
             createHTMLUserTable(items);
         }
-        else{
-            alert('Error searching user');
-        }
     }
     catch(err){
         console.error('Error searching user:', err);
@@ -88,7 +85,7 @@ document.getElementById('user-search-input').addEventListener('keydown', functio
 
 document.getElementById("add-user-button").addEventListener("click", async () => {
 
-    const name = prompt("Enter Name:");
+    const name = prompt("Enter Name:"); if (!name) {return;} // If cancel is pressed, return
     const AM = prompt("Enter AM:");
     const email = prompt("Enter Email:");
     const phone = prompt("Enter Phone:");
@@ -120,7 +117,7 @@ document.getElementById("add-user-button").addEventListener("click", async () =>
 
 document.getElementById("edit-user-button").addEventListener("click", async () => {
     
-        const AM = prompt("Enter AM to Edit:");
+        const AM = prompt("Enter AM to Edit:"); if (!AM) {return;} // If cancel is pressed, return
         const name = prompt("Enter New Name:");
         const email = prompt("Enter New Email:");
         const phone = prompt("Enter New Phone:");
@@ -155,7 +152,6 @@ document.getElementById("delete-user-button").addEventListener("click", async ()
     const AM = prompt("Enter AM:");
 
     if (!AM) {
-        alert('AM is required');
         return;
     }
 
@@ -181,7 +177,7 @@ document.getElementById("delete-user-button").addEventListener("click", async ()
 
 document.getElementById("delete-item-assigned-button").addEventListener("click", async () => {
     
-        const AM = prompt("Enter AM:");
+        const AM = prompt("Enter AM:"); if (!AM) {return;} // If cancel is pressed, return
         const barcode = prompt("Enter Barcode:");
     
         if (!AM || !barcode) {
@@ -213,10 +209,7 @@ document.getElementById("clear-items-assigned-button").addEventListener("click",
         
             const AM = prompt("Enter AM:");
         
-            if (!AM) {
-                alert('AM is required');
-                return;
-            }
+            if (!AM) {return;}
         
             try{
                 const response  = await fetch('/clear-items-assigned', {

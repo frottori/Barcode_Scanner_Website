@@ -177,6 +177,7 @@ table td:first-child {
     justify-content: space-between; /* Distribute space between items */
     padding: 0 10px; /* Add some padding to the sides */
     margin-bottom: 10px; /* Add space below the header */
+    margin-top: 10px; /* Add space above the header */
 }
 
 .header-container h1 {
@@ -205,7 +206,7 @@ table td:first-child {
 /* Hover effect for the link */
 #member:hover {
     color: #4191c0; /* Lighter blue shade */
-    text-shadow: 0px 0px 5px rgba(65, 145, 192, 0.5); /* Subtle glow effect */
+    text-shadow: 0px 0px 5px rgba(116, 197, 244, 0.5); /* Subtle glow effect */
     cursor: pointer; /* Change cursor to pointer */
 }
 
