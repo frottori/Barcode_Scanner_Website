@@ -86,3 +86,16 @@ INSERT INTO barcodes (barcode, name, specs, quantity, status, category) VALUES
 (85, 'Photoresistor Module', '-', 2, 'Άγνωστη','Υλικό FossBot'),
 (86, 'Οπτικός Χιλιομετρητής', '-', 2, 'Άγνωστη','Υλικό FossBot'),
 (87, 'L293D Motor Drive Shield', '-','-', 'Άγνωστη','-');
+
+INSERT INTO users (AM,name, email, phone) VALUES 
+('21390095','ΔΗΜΗΤΡΗΣ ΚΟΝΤΟΥΛΗΣ', 'dimkon2003@gmail.com', '6987807595'),
+('24390025','ΔΗΜΗΤΡΑ ΦΛΏΡΟΥ', 'dimiflo79@gmail.com', '6987807595'),
+('21390021','ΕΥΦΡΟΣΥΝΗ ΒΑΡΣΟΥ', 'frossovarsou@gmail.com', '6987807595'),
+('21390066','ΣΠΥΡΙΔΩΝ ΘΑΝΟΣ', 'spyrosthan2205@gmail.com', '6987807595'),
+('21390146','ΝΙΚΟΛΑΟΣ-ΙΣΑΑΚ ΜΠΙΤΣΙΚΑΣ', 'nikolasbts03@gmail.com', '6987807595'),
+('21390132','ΆΓΓΕΛΟΣ ΚΩΝΣΤΑΝΤΊΝΟΣ ΜΕΝΤΖΕΛΟΣ', 'aggelosmentzelos8@gmail.com', '6987807595'),
+('21390116','ΗΛΊΑΣ ΔΗΜΉΤΡΙΟΣ ΚΩΣΤΟΠΟΥΛΟΣ', 'kostopoulos.ilias53@gmail.com', '6987807595'),
+('24390075','ΕΜΜΑΝΟΥΉΛ  ΚΌΡΜΠΗΣ ', 'mkormpis@gmail.com', '6987807595'),
+('21390176','ΙΩΑΝΝΗΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', 'giannespapadopoulos4@gmail.com', '6987807595'),
+('24390128','ΒΑΣΙΛΕΙΟΣ ΜΑΝΩΛΑΚΑΣ', 'vasilismanolakas@gmail.com', '6987807595'),
+('21390150','ΒΑΣΙΛΕΙΟΣ ΜΑΝΩΛΑΚΑΣ', 'xristosbuzukas100@gmail.com', '6987807595');

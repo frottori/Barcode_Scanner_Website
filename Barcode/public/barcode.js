@@ -18,7 +18,6 @@ async function createHTMLTable(items){
         <th>Quantity</th>
         <th>Condition</th>
         <th>Extra</th>
-        <th>Occupant</th>
         <th>Barcode</th>
     `;
     scannedItemsTable.appendChild(headerRow);
@@ -33,7 +32,6 @@ async function createHTMLTable(items){
             <td>${item.quantity}</td>
             <td>${item.status}</td>
             <td>${item.category}</td>
-            <td>${item.occupant}</td>
             <td>${item.barcode}</td>
         `;
         scannedItemsTable.appendChild(row);
@@ -53,57 +51,6 @@ async function loadScannedItems() {
         console.error('Error fetching scanned items:', error);
     }
 }
-
-// async function loadAssignedItems(){
-//   // Fetch data from the backend
-//   fetch('/get-assigned-items')
-//   .then(response => response.json())
-//   .then(data => {
-//       Object.entries(data).forEach(([userName, items]) => {
-//           // Create a title for the user
-//           const userTitle = document.createElement('h2');
-//           userTitle.textContent = userName;
-//           output.appendChild(userTitle);
-
-//           // Create a table for the user's items
-//           const table = document.createElement('table');
-//           table.border = '1';
-//           table.style.marginBottom = '20px';
-
-//           // Create table headers
-//           const headerRow = document.createElement('tr');
-//           const headers = ['Item Name', 'Barcode', 'Quantity'];
-//           headers.forEach(headerText => {
-//               const th = document.createElement('th');
-//               th.textContent = headerText;
-//               headerRow.appendChild(th);
-//           });
-//           table.appendChild(headerRow);
-
-//           // Populate table rows
-//           items.forEach(item => {
-//               const row = document.createElement('tr');
-//               const itemCell = document.createElement('td');
-//               itemCell.textContent = item.item_name;
-
-//               const barcodeCell = document.createElement('td');
-//               barcodeCell.textContent = item.barcode;
-
-//               const quantityCell = document.createElement('td');
-//               quantityCell.textContent = item.quantity;
-
-//               row.appendChild(itemCell);
-//               row.appendChild(barcodeCell);
-//               row.appendChild(quantityCell);
-//               table.appendChild(row);
-//           });
-
-//           // Append the table to the output div
-//           output.appendChild(table);
-//       });
-//   })
-//   .catch(error => console.error('Error fetching data:', error));
-// }
 
 // Event listener for buttons
 document.getElementById("add-item-button").addEventListener("click", () => {
@@ -352,20 +299,21 @@ async function takeItem(){
                 const data = await response.json();
                 if (data.exists) {
                     quantity = data.quantity;
-                    const occuName = prompt("Enter the Occupant name:");
+                    const AM = prompt("Enter the AM to Assign:");
+                    const takeQuantity = prompt("Enter the quantity to take:");
 
-                if (occuName) {
+                if (AM) {
                
                         const saveResponse = await fetch('/take', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ barcode: scannedData, occupant: occuName }),
+                            body: JSON.stringify({ barcode: scannedData, AM: AM, quantity: takeQuantity }),
                         });
 
                         if (saveResponse.ok) {
-                            console.log('Item taken successfully.');
+                            alert('Item taken successfully.');
                         } else {
-                            console.error('Failed to take item.');
+                            alert('Failed to take item.');
                         }
                     } 
                 }    

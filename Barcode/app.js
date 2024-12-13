@@ -17,32 +17,44 @@ const db = new sqlite3.Database('./database.db', (err) => {
 
 db.run(`
     CREATE TABLE IF NOT EXISTS barcodes 
-    (id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT, 
-    specs TEXT DEFAULT '-',
-    quantity INTEGER DEFAULT 1, 
-    status TEXT DEFAULT 'Άγνωστη',
-    category TEXT DEFAULT '-',
-    occupant TEXT DEFAULT '-',
-    barcode TEXT 
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT, 
+        specs TEXT DEFAULT '-',
+        quantity INTEGER DEFAULT 1, 
+        status TEXT DEFAULT 'Άγνωστη',
+        category TEXT DEFAULT '-',
+        barcode TEXT
     )
 `);
 db.run(`CREATE TABLE IF NOT EXISTS users 
     (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    name TEXT, email TEXT, 
+    AM TEXT UNIQUE,
+    name TEXT,
+    email TEXT, 
     phone TEXT)`);
 db.run(`
     CREATE TABLE IF NOT EXISTS items_assigned (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
         barcode_id INTEGER,
-        name TEXT,
-        barcode Text,
-        Quantity TEXT,
+        name TEXT, 
+        specs TEXT DEFAULT '-',
+        quantity INTEGER DEFAULT 1, 
+        barcode TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (barcode_id) REFERENCES barcodes(id)
     )
 `);
+
+app.get('/barcodes', (req, res) => {
+    db.all('SELECT id, name, specs, quantity, status, category, barcode FROM barcodes', [], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        return res.json(rows); // Send the rows as JSON
+    });
+});
 
 app.post('/save', (req, res) => {
     const { barcode, name, specs, quantity, status, category } = req.body;
@@ -57,16 +69,6 @@ app.post('/save', (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         res.status(201).json({ success: true });
-    });
-});
-
-app.get('/barcodes', (req, res) => {
-    db.all('SELECT id, name, specs, quantity, status, category, occupant, barcode FROM barcodes', [], (err, rows) => {
-        if (err) {
-            console.error('Database error:', err.message);
-            return res.status(500).json({ error: err.message });
-        }
-        return res.json(rows); // Send the rows as JSON
     });
 });
 
@@ -114,19 +116,41 @@ app.post('/delete', (req, res) => {
 
 app.post('/take', (req, res) => {
 
-    const { barcode, occupant } = req.body;
+    const { barcode, AM, quantity } = req.body;
 
-    if (!barcode || !occupant) {
-        return res.status(400).json({ error: 'Barcode and occupant are required' });
+    if (!barcode || !AM) {
+        return res.status(400).json({ error: 'Barcode and AM are required' });
     }
 
-    db.run('UPDATE barcodes SET occupant = ? WHERE barcode LIKE ?', [occupant, barcode], (err) => {
+    db.get('SELECT id FROM users WHERE AM = ?', [AM], (err, user) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-
-        res.json({ success: true });
+    
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+    
+        db.get('SELECT id FROM barcodes WHERE barcode = ?', [barcode], (err, barcodeItem) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+    
+            if (!barcodeItem) {
+                return res.status(404).json({ error: 'Barcode not found' });
+            }
+    
+            db.run('INSERT INTO items_assigned (user_id, barcode_id, quantity) VALUES (?,?,?)', 
+                [user.id, barcodeItem.id, quantity], (err) => {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    return res.status(500).json({ error: err.message });
+                }
+                res.status(201).json({ success: true });
+            });
+        });
     });
 });
 
@@ -137,7 +161,7 @@ app.post('/search', (req, res) => {
         return res.status(400).json({ error: 'Barcode is required' });
     }
 
-    db.all('SELECT id, barcode, name, quantity, specs, status, category, occupant FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
+    db.all('SELECT id, barcode, name, quantity, specs, status, category FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
@@ -152,7 +176,6 @@ app.post('/search', (req, res) => {
         res.json(rows);
     });
 });
-
 
 app.post('/update-barcode', (req, res) => {
     const { barcode, id } = req.body;
@@ -251,30 +274,177 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
-// app.get('/get-assigned-items', (req, res) => {
-//     const query = `
-//         SELECT users.name AS user_name, 
-//                items_assigned.name AS item_name, 
-//                items_assigned.barcode AS barcode, 
-//                items_assigned.Quantity AS quantity
-//         FROM items_assigned
-//         JOIN users ON items_assigned.user_id = users.id
-//         ORDER BY users.name;
-//     `;
-//     db.all(query, [], (err, rows) => {
-//         if (err) {
-//             res.status(500).json({ error: err.message });
-//         } else {
-//             const groupedData = rows.reduce((acc, row) => {
-//                 if (!acc[row.user_name]) acc[row.user_name] = [];
-//                 acc[row.user_name].push({
-//                     item_name: row.item_name,
-//                     barcode: row.barcode,
-//                     quantity: row.quantity,
-//                 });
-//                 return acc;
-//             }, {});
-//             res.json(groupedData);
-//         }
-//     });
-// });
+//! user.html
+
+app.get('/get-assigned-items', (req, res) => {
+    const query = `
+        SELECT users.name AS user_name, 
+               users.email AS user_email, 
+               users.phone AS user_phone,
+               users.AM AS user_AM,
+
+               barcodes.name AS item_name, 
+               barcodes.specs AS item_specs,
+               barcodes.barcode AS barcode, 
+               items_assigned.quantity AS quantity
+        FROM users
+        LEFT JOIN items_assigned ON users.id = items_assigned.user_id
+        LEFT JOIN barcodes ON items_assigned.barcode_id = barcodes.id
+        ORDER BY users.id;
+    `;
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            const groupedData = rows.reduce((acc, row) => {
+                if (!acc[row.user_name]) {
+                    acc[row.user_name] = {
+                        am: row.user_AM,
+                        email: row.user_email,
+                        phone: row.user_phone,
+                        items: []
+                    };
+                }
+                if (row.item_name) { // Add item if it exists
+                    acc[row.user_name].items.push({
+                        item_name: row.item_name,
+                        item_specs: row.item_specs,
+                        barcode: row.barcode,
+                        quantity: row.quantity,
+                    });
+                }
+                return acc;
+            }, {});
+
+            // Ensure every user has at least one placeholder row if no items exist
+            Object.keys(groupedData).forEach(userName => {
+                if (groupedData[userName].items.length === 0) {
+                    groupedData[userName].items.push({
+                        item_name: '-',
+                        item_specs: '-',
+                        barcode: '-',
+                        quantity: '-',
+                    });
+                }
+            });
+            res.json(groupedData);
+        }
+    });
+});
+
+app.post('/add-user', (req, res) => {
+    const { name, AM, email, phone } = req.body;
+
+    if (!name || !email || !phone) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    db.run('INSERT INTO users (name, AM, email, phone) VALUES (?,?,?,?)', [name ,AM, email, phone], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/delete-user', (req, res) => {
+
+    const { AM } = req.body;
+
+    if (!AM) {
+        return res.status(400).json({ error: 'AM is required' });
+    }
+
+    db.run('DELETE FROM users WHERE AM = ?', [AM], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/edit-user', (req, res) => {
+    const { name, AM, email, phone } = req.body;
+
+    if (!name || !AM || !email || !phone) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    db.run('UPDATE users SET name = ?, email = ?, phone = ? WHERE AM = ?', [name, email, phone, AM], (err) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/search-user', (req, res) => {
+    const { AM } = req.body;
+
+    if (!AM) {
+        return res.status(400).json({ error: 'AM is required' });
+    }
+
+    const query = `
+        SELECT users.name AS user_name, 
+               users.email AS user_email, 
+               users.phone AS user_phone,
+               users.AM AS user_AM,
+               barcodes.name AS item_name, 
+               barcodes.specs AS item_specs,
+               barcodes.barcode AS barcode, 
+               items_assigned.quantity AS quantity
+        FROM users
+        LEFT JOIN items_assigned ON users.id = items_assigned.user_id
+        LEFT JOIN barcodes ON items_assigned.barcode_id = barcodes.id
+        WHERE users.AM LIKE ?
+        ORDER BY users.id;
+    `;
+    db.all(query, [AM], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'No users found' });
+        }
+
+        const groupedData = rows.reduce((acc, row) => {
+            if (!acc[row.user_name]) {
+                acc[row.user_name] = {
+                    am: row.user_AM,
+                    email: row.user_email,
+                    phone: row.user_phone,
+                    items: []
+                };
+            }
+            if (row.item_name) { // Add item if it exists
+                acc[row.user_name].items.push({
+                    item_name: row.item_name,
+                    item_specs: row.item_specs,
+                    barcode: row.barcode,
+                    quantity: row.quantity,
+                });
+            }
+            return acc;
+        }, {});
+
+        // Ensure every user has at least one placeholder row if no items exist
+        Object.keys(groupedData).forEach(userName => {
+            if (groupedData[userName].items.length === 0) {
+                groupedData[userName].items.push({
+                    item_name: '-',
+                    item_specs: '-',
+                    barcode: '-',
+                    quantity: '-',
+                });
+            }
+        });
+
+        res.json(groupedData);
+    });
+});

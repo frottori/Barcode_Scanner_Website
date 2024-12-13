@@ -79,15 +79,25 @@ input[type="text"]:focus {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+table td {
+    text-align: center;
+    padding: 10px;
+}
+
+table td:first-child {
+    text-align: left;
+}
+
 /* Add general table styling */
-#scanned-items-table {
+#scanned-items-table, table
+{
     width: 100%;
     border-collapse: collapse;
     background-color: #ffffff;
 }
 
 /* Style the table header */
-#scanned-items-table th {
+#scanned-items-table th, table th {
     background-color: #1f5075; /* Light grey background */
     color: #ffffff; /* Dark text color */
     padding: 10px;
@@ -95,7 +105,7 @@ input[type="text"]:focus {
     border: 1px solid #03224b;
 }
 
-#scanned-items-table td {
+#scanned-items-table td, table td {
     border: 1px solid #e9e7e7; /* Add a border around cells */
 }
 
@@ -117,6 +127,10 @@ input[type="text"]:focus {
 }
 
 /* Center text for columns 4, 5, 6, 7 */
+#scanned-items-table td:nth-child(2)
+{
+    text-align: left;
+}
 #scanned-items-table td:nth-child(3),
 #scanned-items-table td:nth-child(4),
 #scanned-items-table td:nth-child(5),
@@ -126,16 +140,16 @@ input[type="text"]:focus {
 }
 
 /* Add alternating row colors */
-#scanned-items-table tr:nth-child(even) {
+#scanned-items-table tr:nth-child(even), table tr:nth-child(even) {
     background-color: #f9f9f9; /* Light grey for even rows */
 }
 
-#scanned-items-table tr:nth-child(odd) {
+#scanned-items-table tr:nth-child(odd), table tr:nth-child(odd) {
     background-color: #ffffff; /* White for odd rows */
 }
 
 /* Add hover effect for rows */
-#scanned-items-table tr:hover {
+#scanned-items-table tr:hover, table tr:hover {
     background-color: #e9e6e689 !important; /* Light grey on hover */
 }
 
@@ -148,6 +162,7 @@ input[type="text"]:focus {
     padding: 10px;
     border-bottom: 1px solid #ccc;
     margin: 0; 
+    border: #000;
 }
 
 .header-container {
@@ -163,6 +178,12 @@ input[type="text"]:focus {
 
 .header-container img {
     height: 120px; /* Adjust the height as needed */
+}
+
+.user-items-container {
+    padding: 0px;
+    background-color: inherit; /* Matches the body's color */
+    margin-left: 0px;
 }
 
 #member {
@@ -208,4 +229,26 @@ a:hover {
 a:active {
     color: #14476f; /* Darker blue when clicked */
     text-shadow: none; /* Remove glow on active */
+}
+
+caption {
+    display: table-caption; /* Ensures it behaves as part of the table */
+    text-align: center; /* Centers the text inside the caption */
+    font-size: 20px;
+    color: #1c6298;
+    background-color: #e7eef4de; /* Background color */
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #bad8e7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    caption-side: top; /* Keeps it at the top of the table */
+}
+
+div, table, tr, td, th {
+    background-color: inherit; /* Use the body's background color */
+}
+
+table {
+    border: none; /* Remove any borders */
 }
