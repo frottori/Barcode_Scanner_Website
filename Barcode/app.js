@@ -21,6 +21,7 @@ db.run(`
         name TEXT, 
         specs TEXT DEFAULT '-',
         quantity INTEGER DEFAULT 1, 
+        assigned INTEGER DEFAULT 0,
         status TEXT DEFAULT 'Άγνωστη',
         category TEXT DEFAULT '-',
         barcode TEXT
@@ -47,7 +48,7 @@ db.run(`
 `);
 
 app.get('/barcodes', (req, res) => {
-    db.all('SELECT id, name, specs, quantity, status, category, barcode FROM barcodes', [], (err, rows) => {
+    db.all('SELECT id, name, specs, quantity, assigned, status, category, barcode FROM barcodes', [], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
@@ -86,12 +87,14 @@ app.post('/check', (req, res) => {
             return res.status(500).json({ error: err.message });
         }
 
+        // Add
         if (row && flag) {
             // Barcode exists, return the current quantity
             db.run('UPDATE barcodes SET quantity = quantity + 1 WHERE barcode = ?', [barcode]);
             return res.status(200).json({ exists: true, quantity: row.quantity });
         } 
-        else if (flag == false) {
+        // Assign
+        else if (row && flag == false) {
             return res.status(200).json({ exists: true });
         } 
         else {
@@ -119,40 +122,78 @@ app.post('/delete', (req, res) => {
 });
 
 app.post('/take', (req, res) => {
-
     const { barcode, AM, quantity } = req.body;
 
     if (!barcode || !AM) {
         return res.status(400).json({ error: 'Barcode and AM are required' });
     }
 
-    db.get('SELECT id FROM users WHERE AM = ?', [AM], (err, user) => {
+    db.get('SELECT quantity, assigned FROM barcodes WHERE barcode = ?', [barcode], (err, row) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-    
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+
+        if (!row) {
+            return res.status(404).json({ error: 'Barcode not found' });
         }
-    
-        db.get('SELECT id FROM barcodes WHERE barcode = ?', [barcode], (err, barcodeItem) => {
+
+        if (row.assigned + quantity > row.quantity) {
+            return res.status(400).json({ error: 'Assigned quantity cannot be greater than available quantity' });
+        }
+
+        db.run('UPDATE barcodes SET assigned = assigned + ? WHERE barcode = ?', [quantity, barcode], (err) => {
             if (err) {
                 console.error('Database error:', err.message);
                 return res.status(500).json({ error: err.message });
             }
-    
-            if (!barcodeItem) {
-                return res.status(404).json({ error: 'Barcode not found' });
+        });
+
+        db.get('SELECT id FROM users WHERE AM = ?', [AM], (err, user) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ error: err.message });
             }
-    
-            db.run('INSERT INTO items_assigned (user_id, barcode_id, quantity) VALUES (?,?,?)', 
-                [user.id, barcodeItem.id, quantity], (err) => {
+        
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+        
+            db.get('SELECT id FROM barcodes WHERE barcode = ?', [barcode], (err, barcodeItem) => {
                 if (err) {
                     console.error('Database error:', err.message);
                     return res.status(500).json({ error: err.message });
                 }
-                res.status(201).json({ success: true });
+        
+                if (!barcodeItem) {
+                    return res.status(404).json({ error: 'Barcode not found' });
+                }
+
+                db.get('SELECT id, quantity FROM items_assigned WHERE user_id = ? AND barcode_id = ?', [user.id, barcodeItem.id], (err, itemAssigned) => {
+                    if (err) {
+                        console.error('Database error:', err.message);
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    if (itemAssigned) {
+                        db.run('UPDATE items_assigned SET quantity = quantity + ? WHERE id = ?', [quantity, itemAssigned.id], (err) => {
+                            if (err) {
+                                console.error('Database error:', err.message);
+                                return res.status(500).json({ error: err.message });
+                            }
+                            res.status(201).json({ success: true });
+                        });
+                    } else {
+                        db.run('INSERT INTO items_assigned (user_id, barcode_id, quantity) VALUES (?,?,?)', 
+                            [user.id, barcodeItem.id, quantity], (err) => {
+                            if (err) {
+                                console.error('Database error:', err.message);
+                                return res.status(500).json({ error: err.message });
+                            }
+                            res.status(201).json({ success: true });
+                        });
+                    }
+                });
             });
         });
     });
@@ -165,7 +206,7 @@ app.post('/search', (req, res) => {
         return res.status(400).json({ error: 'Barcode is required' });
     }
 
-    db.all('SELECT id, barcode, name, quantity, specs, status, category FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
+    db.all('SELECT id, barcode, name, quantity, assigned specs, status, category FROM barcodes WHERE barcode LIKE ?', [barcode], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
@@ -459,20 +500,43 @@ app.post('/search-user', (req, res) => {
 });
 
 app.post('/delete-item-assigned', (req, res) => {
-    const {AM, barcode} = req.body;
+    const { AM, barcode } = req.body;
 
     if (!AM || !barcode) {
         return res.status(400).json({ error: 'AM and barcode are required' });
     }
 
-    db.run(`DELETE FROM items_assigned 
+    db.get(`SELECT quantity FROM items_assigned 
             WHERE user_id = (SELECT id FROM users WHERE AM = ?) 
-            AND barcode_id = (SELECT id FROM barcodes WHERE barcode = ?)`, [AM, barcode], (err) => {
+            AND barcode_id = (SELECT id FROM barcodes WHERE barcode = ?)`, [AM, barcode], (err, row) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-        res.json({ success: true });
+
+        if (!row) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+
+        const quantityToRemove = row.quantity;
+
+        db.run(`DELETE FROM items_assigned 
+                WHERE user_id = (SELECT id FROM users WHERE AM = ?) 
+                AND barcode_id = (SELECT id FROM barcodes WHERE barcode = ?)`, [AM, barcode], (err) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+
+            db.run(`UPDATE barcodes SET assigned = assigned - ? WHERE barcode = ?`, [quantityToRemove, barcode], (err) => {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    return res.status(500).json({ error: err.message });
+                }
+
+                res.json({ success: true });
+            });
+        });
     });
 });
 
@@ -483,12 +547,38 @@ app.post('/clear-items-assigned', (req, res) => {
         return res.status(400).json({ error: 'AM is required' });
     }
 
-    db.run(`DELETE FROM items_assigned 
-            WHERE user_id = (SELECT id FROM users WHERE AM = ?)`, [AM], (err) => {
+    db.all(`SELECT barcode_id, quantity FROM items_assigned 
+            WHERE user_id = (SELECT id FROM users WHERE AM = ?)`, [AM], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-        res.json({ success: true });
+
+        const updatePromises = rows.map(row => {
+            return new Promise((resolve, reject) => {
+                db.run(`UPDATE barcodes SET assigned = assigned - ? WHERE id = ?`, [row.quantity, row.barcode_id], (err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve();
+                });
+            });
+        });
+
+        Promise.all(updatePromises)
+            .then(() => {
+                db.run(`DELETE FROM items_assigned 
+                        WHERE user_id = (SELECT id FROM users WHERE AM = ?)`, [AM], (err) => {
+                    if (err) {
+                        console.error('Database error:', err.message);
+                        return res.status(500).json({ error: err.message });
+                    }
+                    res.json({ success: true });
+                });
+            })
+            .catch(err => {
+                console.error('Database error:', err.message);
+                res.status(500).json({ error: err.message });
+            });
     });
 });

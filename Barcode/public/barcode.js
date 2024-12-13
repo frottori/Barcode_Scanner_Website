@@ -16,6 +16,7 @@ async function createHTMLTable(items){
         <th>Name</th>
         <th>Specifications</th>
         <th>Quantity</th>
+        <th>Assigned Quantity</th>
         <th>Condition</th>
         <th>Extra</th>
         <th>Barcode</th>
@@ -30,6 +31,7 @@ async function createHTMLTable(items){
             <td>${item.name}</td>
             <td>${item.specs}</td>
             <td>${item.quantity}</td>
+            <td>${item.assigned}</td>
             <td>${item.status}</td>
             <td>${item.category}</td>
             <td>${item.barcode}</td>
