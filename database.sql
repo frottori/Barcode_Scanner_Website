@@ -85,7 +85,16 @@ INSERT INTO barcodes (barcode, name, specs, quantity, status, category) VALUES
 (84, 'LED 5050 SMD Module RGB', '-', 1, 'Άγνωστη','Υλικό FossBot'),
 (85, 'Photoresistor Module', '-', 2, 'Άγνωστη','Υλικό FossBot'),
 (86, 'Οπτικός Χιλιομετρητής', '-', 2, 'Άγνωστη','Υλικό FossBot'),
-(87, 'L293D Motor Drive Shield', '-','-', 'Άγνωστη','-');
+(87, 'L293D Motor Drive Shield', '-', 3, 'Καινούργιο', '-'),
+(88, 'Mini Power Hub', 'with BEC 5V & 12V for Multicopter Quadcopter', 1, 'Καινούργιο', '-'),
+(89, 'Ardupilot APM2.8 Flight Controller', 'V2.8.0 FC without Compass+M8N GPS for RC FPV Multicopter Airplane Quadcopter Drone', 2, 'Καινούργιο', '-'),
+(90, 'Display Control Module MAX7219', '8x8 Dot LED Matrix Module MCU LED', 1, 'Καινούργιο', '-'),
+(91, 'Καλώδιο Micro Usb', 'Usb σε Micro Usb', 3, 'Καινούργιο', '-'),
+(92, 'Καλώδιο Mini Usb', 'USB σε Mini USB', 1, 'Καινούργιο', '-'),
+(93, 'Adapter Jack DC', '-', 1, 'Καινούργιο', '-'),
+(94, 'Καλώδιο USB-B', 'USB-A male σε USB-B male', 1, 'Καινούργιο', '-'),
+(95, 'Καλώδιο Micro USB', 'Micro USB σε Micro USB', 1, 'Καινούργιο', '-'),
+(96, 'Καλώδιο Micro USB -Type C', 'Type C σε Micro USB', 1, 'Καινούργιο', '-');
 
 INSERT INTO users (AM,name, email, phone) VALUES 
 ('21390095','ΔΗΜΗΤΡΗΣ ΚΟΝΤΟΥΛΗΣ', 'dimkon2003@gmail.com', '6987807595'),
