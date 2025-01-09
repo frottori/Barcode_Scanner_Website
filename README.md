@@ -1,4 +1,4 @@
-# Barcode_Scanner
+# Barcode_Scanner_Website
 
 ## App Setup 
 ```cd Barcode
